@@ -75,8 +75,8 @@ namespace API.Controllers
 
             var user = await _userManager.FindByEmailWithAddressAsync(HttpContext.User);
 
-            return _mapper.Map<Address, AddressDto>(user.Address);
             //return user.Address;
+            return _mapper.Map<Address, AddressDto>(user.Address);
         }
 
         // add address to the user
@@ -127,6 +127,15 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
+            // check if email exists
+            if(CheckEmailExistsAsync(registerDto.Email).Result.Value)
+            {
+                    return new BadRequestObjectResult(new ApiValidationErrorResponse{
+                        Errors =new []
+                        {
+                            "Email address already in use"
+                        }});
+            }
 
             var user = new AppUser
             {
