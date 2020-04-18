@@ -25,8 +25,9 @@ export class AccountService {
 
   loadCurrentUser(token: string) {
     if (token === null) {
+      // if no token currrentuser is null
       this.currentUserSource.next(null);
-      // this return of observable
+      // this return of observable  so auth guard wont give error of subscribe not defined
       return of(null);
     }
 
