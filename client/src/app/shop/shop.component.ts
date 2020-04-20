@@ -1,4 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  OnDestroy,
+} from '@angular/core';
 import { ShopService } from './shop.service';
 import { IProduct } from '../models/product';
 import { IBrand } from '../models/brand';
@@ -34,11 +40,10 @@ export class ShopComponent implements OnInit {
   }
 
   getProducts() {
+    console.log('1...');
     this.shopService.getProducts(this.shopParams).subscribe(
       (response) => {
         this.products = response.data;
-        this.shopParams.pageNumber = response.pageIndex;
-        this.shopParams.pageSize = response.pageSize;
         this.totalCount = response.count;
       },
       (error) => {
@@ -77,7 +82,6 @@ export class ShopComponent implements OnInit {
 
   onTypeSelected(typeId: number) {
     this.shopParams.typeId = typeId;
-    // result starts from page 1
     this.shopParams.pageNumber = 1;
     this.getProducts();
   }
@@ -88,7 +92,6 @@ export class ShopComponent implements OnInit {
   }
 
   onPageChanged(event: any) {
-    // if the filter is applied, this method wont be executed
     if (this.shopParams.pageNumber !== event) {
       this.shopParams.pageNumber = event;
       this.getProducts();
@@ -98,13 +101,12 @@ export class ShopComponent implements OnInit {
   onSearch() {
     this.shopParams.search = this.searchTerm.nativeElement.value;
     this.shopParams.pageNumber = 1;
-    // refresh
     this.getProducts();
   }
 
   // reset filters
   onReset() {
-    this.searchTerm.nativeElement.value = undefined;
+    this.searchTerm.nativeElement.value = '';
     this.shopParams = new ShopParams();
     this.getProducts();
   }

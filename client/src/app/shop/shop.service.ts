@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { IPagination } from '../models/pagination';
+import { IPagination, Pagination } from '../models/pagination';
 import { IBrand } from '../models/brand';
 import { IType } from '../models/productType';
 import { map } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { ShopParams } from '../models/shopParams';
 import { IProduct } from '../models/product';
 
@@ -12,6 +13,10 @@ import { IProduct } from '../models/product';
 })
 export class ShopService {
   baseUrl = 'https://localhost:5001/api/';
+  products: IProduct[];
+  brands: IBrand[];
+  types: IType[];
+  pagination = new Pagination();
 
   constructor(private http: HttpClient) {}
 
@@ -39,6 +44,8 @@ export class ShopService {
       })
       .pipe(
         map((response) => {
+          // store in service
+          this.products = response.body.data;
           return response.body;
         })
       );
@@ -46,14 +53,37 @@ export class ShopService {
 
   // get indi prod
   getProduct(id: number) {
+    const product = this.products.find((p) => p.id === id);
+
+    if (product) {
+      return of(product);
+    }
     return this.http.get<IProduct>(this.baseUrl + 'products/' + id);
   }
 
   getBrands() {
-    return this.http.get<IBrand[]>(this.baseUrl + 'products/brands');
+    // return from service
+    if (this.brands != null && this.brands.length > 0) {
+      return of(this.brands);
+    }
+    return this.http.get<IBrand[]>(this.baseUrl + 'products/brands').pipe(
+      map((response) => {
+        this.brands = response;
+        return response;
+      })
+    );
   }
 
   getTypes() {
-    return this.http.get<IType[]>(this.baseUrl + 'products/types');
+    // return from service
+    if (this.types != null && this.types.length > 0) {
+      return of(this.types);
+    }
+    return this.http.get<IType[]>(this.baseUrl + 'products/types').pipe(
+      map((response) => {
+        this.types = response;
+        return response;
+      })
+    );
   }
 }

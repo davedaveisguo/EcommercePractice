@@ -24,15 +24,31 @@ export class BasketService {
 
   constructor(private http: HttpClient) {}
 
-  setShippingPrice(deliveryMethod: IDeliveryMethod){
+  createPaymentIntent() {
+    return this.http
+      .post(this.baseUrl + 'payments/' + this.getCurrentBasketValue().id, {})
+      .pipe(
+        map((basket: IBasket) => {
+          this.basktSource.next(basket);
+        })
+      );
+  }
+
+  // update basket when select shipping method
+  setShippingPrice(deliveryMethod: IDeliveryMethod) {
     this.shipping = deliveryMethod.price;
+    const basket = this.getCurrentBasketValue();
+    basket.deliveryMethodId = deliveryMethod.id;
+    basket.shippingPrice = deliveryMethod.price;
     this.calculateTotals();
+    this.setBasket(basket);
   }
 
   getBasket(id: string) {
     return this.http.get(this.baseUrl + 'basket?id=' + id).pipe(
       map((basket: IBasket) => {
         this.basktSource.next(basket);
+        this.shipping = basket.shippingPrice;
         // set total
         this.calculateTotals();
       })
@@ -103,11 +119,10 @@ export class BasketService {
     }
   }
 
-
-  deletelocalBasket(id: string){
-      this.basktSource.next(null);
-      this.basketTotalSource.next(null);
-      localStorage.removeItem('basket_id');
+  deletelocalBasket(id: string) {
+    this.basktSource.next(null);
+    this.basketTotalSource.next(null);
+    localStorage.removeItem('basket_id');
   }
 
   // remove the basket
@@ -167,6 +182,7 @@ export class BasketService {
   private calculateTotals() {
     const basket = this.getCurrentBasketValue();
     const shipping = this.shipping;
+    console.log('shipping is...' + shipping);
     // a is accumulate  b is item  0 is inital value
     const subtotal = basket.items.reduce((a, b) => b.price * b.quantity + a, 0);
     const total = subtotal + shipping;

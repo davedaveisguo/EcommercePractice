@@ -1,7 +1,7 @@
 <div class="container mt-5">
   <div class="row">
     <div class="col-8">
-      <app-stepper [linearModeSelected]="false" #appStepper>
+      <app-stepper [linearModeSelected]="true" #appStepper>
         <cdk-step [label]="'Address'" [completed]="(checkOutForm.get('addressForm')).valid">
           <app-chekout-address [checkoutForm]="checkOutForm"></app-chekout-address>
         </cdk-step>
@@ -9,7 +9,7 @@
           <app-chekout-delivery [checkoutForm]="checkOutForm"></app-chekout-delivery>
         </cdk-step>
         <cdk-step [label]="'Review'">
-          <app-chekout-review></app-chekout-review>
+          <app-chekout-review [appStepper]="appStepper"></app-chekout-review>
         </cdk-step>
         <cdk-step [label]="'Payment'">
           <app-chekout-payment  [checkoutForm]="checkOutForm"></app-chekout-payment>
@@ -17,7 +17,13 @@
       </app-stepper>
     </div>
     <div class="col-4">
-      <app-order-totals></app-order-totals>
+      <app-order-totals
+      *ngIf="(basketTotals$ | async)"
+      [shippingPrice]="(basketTotals$ | async).shipping"
+      [subtotal]="(basketTotals$ | async).subtotal"
+      [total]="(basketTotals$ | async).total"
+
+      ></app-order-totals>
     </div>
   </div>
 </div>

@@ -10,6 +10,7 @@
         class="custom-control-input"
         type="radio"
         (click)="setShippingPrice(method)"
+        [checked]="true"
       />
       <label for="{{ method.id }}" class="custom-control-label">
         <strong>{{ method.shortName }} - {{ method.price | currency }}</strong>
@@ -26,7 +27,7 @@
     <i class="fa fa-angle-left"></i>Back to Address
   </button>
 
-  <button class="btn btn-primary" cdkStepperNext>
+  <button class="btn btn-primary" cdkStepperNext  [disabled]="checkoutForm.get('deliveryForm').invalid">
     Go to Review<i class="fa fa-angle-right"></i>
   </button>
 </div>
